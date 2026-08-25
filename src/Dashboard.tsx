@@ -45,7 +45,7 @@ function Dashboard() {
         setLoading(true);
 
         const response = await fetch(
-          `http://localhost:8000/todo-calendar/progress?year=${year}&month=${month}`,
+          `https://todo-mfe-be.onrender.com/todo-calendar/progress?year=${year}&month=${month}`,
           {
             method: "GET",
             credentials: "include",
