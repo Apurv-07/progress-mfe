@@ -1,78 +1,331 @@
-.todo-progress {
+/* =========================================
+   PROGRESS DASHBOARD
+========================================= */
+
+.progress-dashboard {
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.completed-summary {
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-  background: #f5f5f5;
+
+/* =========================================
+   CARDS
+========================================= */
+
+.progress-card {
+  width: 100%;
+  box-sizing: border-box;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+
+  padding: 24px;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.completed-summary h2 {
+
+/* =========================================
+   SUMMARY
+========================================= */
+
+.progress-card-label {
   margin: 0;
-  font-size: 18px;
-}
 
-.completed-summary p {
-  margin: 8px 0 0;
-  font-size: 36px;
-  font-weight: 700;
-}
-
-.todo-calendar {
-  width: 100%;
-  max-width: 500px;
-  margin-bottom: 40px;
-}
-
-.todo-calendar .react-calendar {
-  width: 100%;
-  border: none;
-}
-
-.progress-dot {
-  display: block;
-  width: fit-content;
-  min-width: 18px;
-  height: 18px;
-  line-height: 18px;
-  border-radius: 50%;
-  margin: 4px auto 0;
-  font-size: 10px;
+  font-size: 16px;
   font-weight: 600;
-  text-align: center;
+
+  color: #374151;
 }
 
-.progress-dot.completed {
-  background: green;
-  color: white;
+.progress-total {
+  margin: 8px 0 0;
+
+  font-size: 42px;
+  line-height: 1;
+
+  font-weight: 700;
+
+  color: #16a34a;
 }
 
-.progress-dot.incomplete {
-  background: orange;
-  color: white;
-}
-
-.progress-cross {
+.progress-loading {
   display: block;
-  margin: 4px auto 0;
-  height: 18px;
-  line-height: 18px;
-  font-size: 18px;
+
+  margin-top: 8px;
+
+  font-size: 13px;
+  color: #6b7280;
+}
+
+
+/* =========================================
+   CALENDAR
+========================================= */
+
+.calendar-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-calendar {
+  width: 100%;
+  max-width: 1000px;
+
+  border: none !important;
+  font-family: inherit;
+}
+
+
+/*
+ * Calendar navigation
+ */
+
+.progress-calendar .react-calendar__navigation {
+  margin-bottom: 12px;
+}
+
+.progress-calendar
+  .react-calendar__navigation button {
+  font-size: 16px;
+  font-weight: 600;
+
+  border-radius: 8px;
+}
+
+.progress-calendar
+  .react-calendar__navigation button:hover {
+  background: #f3f4f6;
+}
+
+
+/*
+ * Weekday headers
+ */
+
+.progress-calendar
+  .react-calendar__month-view__weekdays {
+  font-size: 12px;
+  font-weight: 600;
+
+  color: #6b7280;
+
+  text-transform: uppercase;
+}
+
+
+/*
+ * Calendar tiles
+ */
+
+.progress-calendar
+  .react-calendar__tile {
+  min-height: 72px;
+
+  padding: 8px;
+
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.progress-calendar
+  .react-calendar__tile:hover {
+  background: #f3f4f6;
+}
+
+
+/*
+ * Today
+ */
+
+.progress-calendar
+  .react-calendar__tile--now {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+
+/*
+ * Selected day
+ */
+
+.progress-calendar
+  .react-calendar__tile--active {
+  background: #dbeafe !important;
+  color: #1e3a8a !important;
+}
+
+
+/* =========================================
+   PROGRESS INDICATORS
+========================================= */
+
+.calendar-progress {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 24px;
+  height: 24px;
+
+  margin-top: 5px;
+
+  padding: 0 6px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
   font-weight: 700;
 }
 
-.progress-chart {
-  width: 100%;
-  height: 350px;
-  padding: 20px;
-  border-radius: 12px;
-  background: #f5f5f5;
+
+/*
+ * Everything completed
+ */
+
+.calendar-progress-complete {
+  background: #22c55e;
+  color: #ffffff;
 }
 
-.progress-chart h2 {
-  margin: 0 0 20px;
+
+/*
+ * Attempted but incomplete
+ */
+
+.calendar-progress-incomplete {
+  background: #f97316;
+  color: #ffffff;
+}
+
+
+/*
+ * No progress record
+ */
+
+.calendar-cross {
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: 22px;
+  line-height: 24px;
+
+  font-weight: 700;
+
+  color: #ef4444;
+}
+
+
+/* =========================================
+   GRAPH
+========================================= */
+
+.graph-card {
+  min-width: 0;
+}
+
+.graph-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 16px;
+}
+
+.graph-header h2 {
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  color: #374151;
+}
+
+.graph-header span {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+
+/*
+ * IMPORTANT:
+ *
+ * ResponsiveContainer needs a parent
+ * with an actual height.
+ */
+
+.graph-container {
+  width: 100%;
+  height: 300px;
+
+  min-width: 0;
+  min-height: 0;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+  .progress-dashboard {
+    padding: 16px;
+  }
+
+  .progress-card {
+    padding: 16px;
+  }
+
+  .progress-calendar
+    .react-calendar__tile {
+    min-height: 58px;
+    padding: 5px;
+  }
+
+  .graph-container {
+    height: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .progress-dashboard {
+    padding: 10px;
+  }
+
+  .progress-card {
+    padding: 12px;
+  }
+
+  .progress-calendar
+    .react-calendar__tile {
+    min-height: 48px;
+    font-size: 12px;
+  }
+
+  .calendar-cross {
+    font-size: 18px;
+  }
+
+  .graph-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 }

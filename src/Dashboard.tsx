@@ -1,7 +1,7 @@
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { useEffect, useMemo, useState } from "react";
-import "./App.css"
+import "./App.css";
 
 import {
   Bar,
@@ -26,20 +26,9 @@ function Dashboard() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [loading, setLoading] = useState(false);
 
-  /*
-   * Calendar's currently visible month.
-   *
-   * Example:
-   * August 2026 -> year = 2026, month = 8
-   * July 2026   -> year = 2026, month = 7
-   */
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth() + 1;
 
-  /*
-   * Fetch progress whenever the calendar
-   * moves to another month.
-   */
   useEffect(() => {
     const getProgress = async () => {
       try {
@@ -59,18 +48,11 @@ function Dashboard() {
 
         const data = await response.json();
 
-        console.log(
-          `Progress for ${year}-${month}:`,
-          data
-        );
+        console.log(`Progress for ${year}-${month}:`, data);
 
         setProgressData(data.results ?? []);
       } catch (error) {
         console.error("Error fetching progress:", error);
-
-        // Important:
-        // If the selected month has no data,
-        // don't keep showing the previous month's data.
         setProgressData([]);
       } finally {
         setLoading(false);
@@ -80,9 +62,6 @@ function Dashboard() {
     getProgress();
   }, [year, month]);
 
-  /*
-   * Compare two dates ignoring time.
-   */
   function isSameDay(date1: Date, date2: Date) {
     return (
       date1.getFullYear() === date2.getFullYear() &&
@@ -91,10 +70,6 @@ function Dashboard() {
     );
   }
 
-  /*
-   * Total tasks completed in the
-   * currently selected month.
-   */
   const totalCompleted = useMemo(() => {
     return progressData.reduce(
       (total, item) => total + item.completed,
@@ -102,9 +77,6 @@ function Dashboard() {
     );
   }, [progressData]);
 
-  /*
-   * Data used by the graph.
-   */
   const chartData = useMemo(() => {
     return [...progressData]
       .sort(
@@ -124,53 +96,49 @@ function Dashboard() {
       }));
   }, [progressData]);
 
-  /*
-   * Called whenever user clicks
-   * previous/next month.
-   */
   const handleMonthChange = ({
     activeStartDate,
   }: {
     activeStartDate: Date | null;
   }) => {
-    if (!activeStartDate) {
-      return;
-    }
+    if (!activeStartDate) return;
 
     setCurrentMonth(activeStartDate);
   };
 
   return (
-    <div className="w-full space-y-6 p-6">
+    <div className="progress-dashboard">
 
       {/* =========================
-          MONTH SUMMARY
-         ========================= */}
+          SUMMARY
+      ========================= */}
 
-      <div className="rounded-xl border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-700">
-          Tasks Completed This Month
-        </h2>
+      <div className="progress-card">
+        <div>
+          <p className="progress-card-label">
+            Tasks Completed This Month
+          </p>
 
-        <p className="mt-2 text-4xl font-bold text-green-600">
-          {totalCompleted}
-        </p>
+          <p className="progress-total">
+            {totalCompleted}
+          </p>
+        </div>
 
         {loading && (
-          <p className="mt-2 text-sm text-gray-500">
+          <span className="progress-loading">
             Loading...
-          </p>
+          </span>
         )}
       </div>
 
 
       {/* =========================
           CALENDAR
-         ========================= */}
+      ========================= */}
 
-      <div className="w-full rounded-xl border bg-white p-6 shadow-sm flex justify-center">
+      <div className="progress-card calendar-card">
         <Calendar
-          className="w-full"
+          className="progress-calendar"
           onActiveStartDateChange={handleMonthChange}
           tileContent={({ date, view }) => {
             if (view !== "month") {
@@ -186,11 +154,12 @@ function Dashboard() {
             );
 
             /*
-             * No progress record for this day.
+             * No progress record:
+             * show cross.
              */
             if (!dayProgress) {
               return (
-                <span className="mt-1 block text-lg font-bold text-red-500">
+                <span className="calendar-cross">
                   ×
                 </span>
               );
@@ -198,14 +167,17 @@ function Dashboard() {
 
             /*
              * Progress exists.
+             *
+             * Green  = all tasks completed
+             * Orange = attempted but not everything completed
              */
             return (
               <span
-                className={`mx-auto mt-1 block w-fit min-w-5 rounded-full px-1 text-xs font-semibold ${
+                className={
                   dayProgress.status
-                    ? "bg-green-500 text-white"
-                    : "bg-orange-500 text-white"
-                }`}
+                    ? "calendar-progress calendar-progress-complete"
+                    : "calendar-progress calendar-progress-incomplete"
+                }
               >
                 {dayProgress.completed}
               </span>
@@ -217,42 +189,70 @@ function Dashboard() {
 
       {/* =========================
           GRAPH
-         ========================= */}
+      ========================= */}
 
-      <div className="h-[350px] w-full rounded-xl border bg-white p-6 shadow-sm">
+      <div className="progress-card graph-card">
 
-        <h2 className="mb-5 text-lg font-semibold text-gray-700">
-          Tasks Completed
-        </h2>
+        <div className="graph-header">
+          <h2>Tasks Completed</h2>
 
-        {chartData.length === 0 ? (
-          <div className="flex h-[260px] items-center justify-center text-gray-500">
-            No progress data for this month
-          </div>
-        ) : (
-          <ResponsiveContainer
-            width="100%"
-            height="90%"
-          >
-            <BarChart data={chartData}>
+          <span>
+            {new Date(year, month - 1).toLocaleDateString(
+              "en-IN",
+              {
+                month: "long",
+                year: "numeric",
+              }
+            )}
+          </span>
+        </div>
 
-              <CartesianGrid strokeDasharray="3 3" />
+        <div className="graph-container">
+          {chartData.length === 0 ? (
+            <div className="graph-empty">
+              No progress data for this month
+            </div>
+          ) : (
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+              minWidth={0}
+              minHeight={0}
+            >
+              <BarChart
+                data={chartData}
+                margin={{
+                  top: 10,
+                  right: 20,
+                  left: 0,
+                  bottom: 10,
+                }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                />
 
-              <XAxis dataKey="date" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fontSize: 12 }}
+                />
 
-              <YAxis allowDecimals={false} />
+                <YAxis
+                  allowDecimals={false}
+                  width={35}
+                />
 
-              <Tooltip />
+                <Tooltip />
 
-              <Bar
-                dataKey="completed"
-                name="Tasks Completed"
-                radius={[4, 4, 0, 0]}
-              />
-
-            </BarChart>
-          </ResponsiveContainer>
-        )}
+                <Bar
+                  dataKey="completed"
+                  name="Tasks Completed"
+                  radius={[5, 5, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
 
       </div>
 
