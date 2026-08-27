@@ -19,6 +19,7 @@ interface Progress {
   day: string;
   completed: number;
   status: boolean;
+  attempted: boolean;
 }
 
 function Dashboard() {
@@ -157,13 +158,13 @@ function Dashboard() {
              * No progress record:
              * show cross.
              */
-            if (!dayProgress) {
-              return (
-                <span className="calendar-cross">
-                  ×
-                </span>
-              );
-            }
+            if (!dayProgress || dayProgress.attempted === false) {
+    return (
+        <span className="mt-1 block text-lg font-bold text-red-500">
+            ×
+        </span>
+    );
+}
 
             /*
              * Progress exists.
