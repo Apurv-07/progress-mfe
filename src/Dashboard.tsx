@@ -12,7 +12,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { BarChart3, Flame, TrendingUp } from "lucide-react";
+import {
+  BarChart3,
+  CheckCircle2,
+  Circle,
+  Flame,
+  TrendingUp,
+  X,
+} from "lucide-react";
 
 interface Progress {
   _id: string;
@@ -21,6 +28,13 @@ interface Progress {
   completed: number;
   status: boolean;
   attempted: boolean;
+}
+
+interface Todo {
+  _id: string;
+  todo: string;
+  status: boolean;
+  createdAt: string;
 }
 
 const IST_TIMEZONE = "Asia/Kolkata";
@@ -64,12 +78,87 @@ function formatISTDate(date: string) {
   }).format(new Date(date));
 }
 
+// Build a YYYY-MM-DD string from the calendar tile's local date parts.
+function toDateParam(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatModalDate(date: Date) {
+  return new Intl.DateTimeFormat("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 function Dashboard() {
   const [progressData, setProgressData] = useState<Progress[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [loading, setLoading] = useState(false);
 
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [dayTodos, setDayTodos] = useState<Todo[]>([]);
+  const [todosLoading, setTodosLoading] = useState(false);
+  const [todosError, setTodosError] = useState<string | null>(null);
+
   const { year, month } = getISTDateParts(currentMonth);
+
+  const handleDateClick = async (date: Date) => {
+    setSelectedDate(date);
+    setDayTodos([]);
+    setTodosError(null);
+    setTodosLoading(true);
+
+    try {
+      const response = await fetch(
+        `https://todo-mfe-be.onrender.com/todo/todos/date/${toDateParam(date)}`,
+        {
+          method: "GET",
+          credentials: "include",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setDayTodos(data.todos ?? []);
+    } catch (error) {
+      console.error("Error fetching todos for date:", error);
+      setTodosError("Couldn't load todos for this day. Please try again.");
+    } finally {
+      setTodosLoading(false);
+    }
+  };
+
+  const closeModal = () => {
+    setSelectedDate(null);
+    setDayTodos([]);
+    setTodosError(null);
+  };
+
+  // Lock body scroll + close on Escape while the modal is open.
+  useEffect(() => {
+    if (!selectedDate) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeModal();
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [selectedDate]);
 
   useEffect(() => {
     const getProgress = async () => {
@@ -178,6 +267,7 @@ function Dashboard() {
             <Calendar
               className="progress-calendar bg-transparent text-slate-100 border-none w-full font-sans"
               onActiveStartDateChange={handleMonthChange}
+              onClickDay={handleDateClick}
               tileContent={({ date, view }) => {
                 if (view !== "month") {
                   return null;
@@ -332,6 +422,132 @@ function Dashboard() {
               )}
             </div>
           </div>
+        </div>
+      </div>
+
+      {selectedDate && (
+        <DayTodosModal
+          date={selectedDate}
+          todos={dayTodos}
+          loading={todosLoading}
+          error={todosError}
+          onClose={closeModal}
+        />
+      )}
+    </div>
+  );
+}
+
+function DayTodosModal({
+  date,
+  todos,
+  loading,
+  error,
+  onClose,
+}: {
+  date: Date;
+  todos: Todo[];
+  loading: boolean;
+  error: string | null;
+  onClose: () => void;
+}) {
+  const completedCount = todos.filter((t) => t.status).length;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Todos for ${formatModalDate(date)}`}
+    >
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Modal panel */}
+      <div className="relative z-10 w-full sm:max-w-lg max-h-[85vh] sm:max-h-[80vh] flex flex-col rounded-t-3xl sm:rounded-3xl bg-slate-900 border border-white/10 shadow-2xl overflow-hidden animate-[modalIn_0.2s_ease-out]">
+        {/* Aurora accent */}
+        <div className="absolute -right-16 -top-16 w-48 h-48 bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/20 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Header */}
+        <div className="relative flex items-start justify-between gap-4 p-5 sm:p-6 border-b border-white/10">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-indigo-400 mb-1">
+              Todos
+            </p>
+            <h2 className="text-lg sm:text-xl font-bold text-white leading-snug break-words">
+              {formatModalDate(date)}
+            </h2>
+            {!loading && !error && todos.length > 0 && (
+              <p className="text-xs text-slate-400 mt-1.5">
+                {completedCount} of {todos.length} completed
+              </p>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="shrink-0 w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="relative flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
+          {loading && (
+            <div className="space-y-3">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="h-16 rounded-2xl bg-white/5 border border-white/10 animate-pulse"
+                />
+              ))}
+            </div>
+          )}
+
+          {!loading && error && (
+            <div className="py-10 text-center text-sm text-red-300">
+              {error}
+            </div>
+          )}
+
+          {!loading && !error && todos.length === 0 && (
+            <div className="py-12 flex flex-col items-center justify-center text-center gap-2 text-slate-500">
+              <Circle className="w-8 h-8 opacity-40" />
+              <p className="text-sm font-medium">No todos for this day</p>
+            </div>
+          )}
+
+          {!loading &&
+            !error &&
+            todos.map((item) => (
+              <div
+                key={item._id}
+                className="flex items-start gap-3 rounded-2xl bg-white/5 border border-white/10 p-4 hover:border-white/20 transition-colors"
+              >
+                <span className="shrink-0 mt-0.5">
+                  {item.status ? (
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  ) : (
+                    <Circle className="w-5 h-5 text-slate-500" />
+                  )}
+                </span>
+                <p
+                  className={`flex-1 min-w-0 text-sm sm:text-base leading-relaxed break-words whitespace-pre-wrap ${
+                    item.status
+                      ? "text-slate-400 line-through decoration-slate-600"
+                      : "text-slate-100"
+                  }`}
+                >
+                  {item.todo}
+                </p>
+              </div>
+            ))}
         </div>
       </div>
     </div>
