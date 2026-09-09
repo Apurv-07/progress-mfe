@@ -14,7 +14,6 @@
   gap: 24px;
 }
 
-
 /* =========================================
    CARDS
 ========================================= */
@@ -27,10 +26,8 @@
 
   padding: 24px;
 
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
-
 
 /* =========================================
    SUMMARY
@@ -65,7 +62,6 @@
   color: #6b7280;
 }
 
-
 /* =========================================
    CALENDAR
 ========================================= */
@@ -84,7 +80,6 @@
   font-family: inherit;
 }
 
-
 /*
  * Calendar navigation
  */
@@ -93,26 +88,22 @@
   margin-bottom: 12px;
 }
 
-.progress-calendar
-  .react-calendar__navigation button {
+.progress-calendar .react-calendar__navigation button {
   font-size: 16px;
   font-weight: 600;
 
   border-radius: 8px;
 }
 
-.progress-calendar
-  .react-calendar__navigation button:hover {
+.progress-calendar .react-calendar__navigation button:hover {
   background: #f3f4f6;
 }
-
 
 /*
  * Weekday headers
  */
 
-.progress-calendar
-  .react-calendar__month-view__weekdays {
+.progress-calendar .react-calendar__month-view__weekdays {
   font-size: 12px;
   font-weight: 600;
 
@@ -121,13 +112,11 @@
   text-transform: uppercase;
 }
 
-
 /*
  * Calendar tiles
  */
 
-.progress-calendar
-  .react-calendar__tile {
+.progress-calendar .react-calendar__tile {
   min-height: 72px;
 
   padding: 8px;
@@ -140,33 +129,27 @@
   justify-content: flex-start;
 }
 
-.progress-calendar
-  .react-calendar__tile:hover {
+.progress-calendar .react-calendar__tile:hover {
   background: #f3f4f6;
 }
-
 
 /*
  * Today
  */
 
-.progress-calendar
-  .react-calendar__tile--now {
+.progress-calendar .react-calendar__tile--now {
   background: #eff6ff;
   color: #1d4ed8;
 }
-
 
 /*
  * Selected day
  */
 
-.progress-calendar
-  .react-calendar__tile--active {
+.progress-calendar .react-calendar__tile--active {
   background: #dbeafe !important;
   color: #1e3a8a !important;
 }
-
 
 /* =========================================
    PROGRESS INDICATORS
@@ -191,7 +174,6 @@
   font-weight: 700;
 }
 
-
 /*
  * Everything completed
  */
@@ -201,7 +183,6 @@
   color: #ffffff;
 }
 
-
 /*
  * Attempted but incomplete
  */
@@ -210,7 +191,6 @@
   background: #f97316;
   color: #ffffff;
 }
-
 
 /*
  * No progress record
@@ -228,7 +208,6 @@
 
   color: #ef4444;
 }
-
 
 /* =========================================
    GRAPH
@@ -261,7 +240,6 @@
   color: #6b7280;
 }
 
-
 /*
  * IMPORTANT:
  *
@@ -277,7 +255,6 @@
   min-height: 0;
 }
 
-
 /* =========================================
    RESPONSIVE
 ========================================= */
@@ -291,8 +268,7 @@
     padding: 16px;
   }
 
-  .progress-calendar
-    .react-calendar__tile {
+  .progress-calendar .react-calendar__tile {
     min-height: 58px;
     padding: 5px;
   }
@@ -367,8 +343,7 @@
     padding: 12px;
   }
 
-  .progress-calendar
-    .react-calendar__tile {
+  .progress-calendar .react-calendar__tile {
     min-height: 48px;
     font-size: 12px;
   }
@@ -382,4 +357,21 @@
     align-items: flex-start;
     gap: 4px;
   }
+}
+
+/* Day-todos modal entrance animation */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Make calendar day tiles feel clickable */
+.progress-calendar .react-calendar__tile {
+  cursor: pointer;
 }
